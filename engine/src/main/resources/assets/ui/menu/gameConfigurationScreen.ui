@@ -1,0 +1,80 @@
+{
+    "type": "engine:gameConfigurationScreen",
+    "skin": "engine:mainMenu",
+    "contents": {
+        "type": "relativeLayout",
+        "contents": [
+            {
+                "type": "UILabel",
+                "id": "title",
+                "family": "title",
+                "text": "${engine:menu#game-config-title}",
+                "layoutInfo": {
+                    "height": 48,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                       "target": "TOP",
+                       "offset": 48
+                   }
+                }
+            },
+            {
+                "type": "UIBox",
+                "id": "container",
+                "layoutInfo": {
+                    "width": 1050,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "BOTTOM",
+                        "offset": 24,
+                        "widget": "title"
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 8
+                    }
+                }
+            },
+            {
+                "type": "ColumnLayout",
+                "columns": 2,
+                "column-widths": [0.32, 0.68],
+                "verticalSpacing": 16,
+                "horizontalSpacing": 8,
+                "layoutInfo": {
+                    "width": 1034,
+                    "use-content-height": true,
+                    "position-horizontal-center": {},
+                    "position-top": {
+                        "target": "TOP",
+                        "widget": "container",
+                        "offset": 8
+                    },
+                    "position-bottom": {
+                        "target": "TOP",
+                        "widget": "close",
+                        "offset": 16
+                    }
+                },
+                "contents": [
+
+                ]
+            },
+            {
+                "type": "UIButton",
+                "text": "${engine:menu#back}",
+                "id": "close",
+                "layoutInfo": {
+                    "width": 128,
+                    "height": 32,
+                    "position-horizontal-center": {},
+                    "position-bottom": {
+                        "target": "BOTTOM",
+                        "offset": 48
+                    }
+                }
+            }
+        ]
+    }
+}

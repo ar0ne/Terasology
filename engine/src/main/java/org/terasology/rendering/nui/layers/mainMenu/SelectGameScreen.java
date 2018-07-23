@@ -26,6 +26,7 @@ import org.terasology.network.NetworkMode;
 import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.nui.WidgetUtil;
 import org.terasology.rendering.nui.databinding.ReadOnlyBinding;
+import org.terasology.rendering.nui.layers.mainMenu.gameConfigurationScreen.GameConfigurationScreen;
 import org.terasology.rendering.nui.layers.mainMenu.gameDetailsScreen.GameDetailsScreen;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameInfo;
 import org.terasology.rendering.nui.layers.mainMenu.savedGames.GameProvider;
@@ -101,6 +102,15 @@ public class SelectGameScreen extends SelectionScreen {
                 detailsScreen.setGameInfo(gameInfo);
                 detailsScreen.setPreviewImage(previewImage.getImage());
                 getManager().pushScreen(detailsScreen);
+            }
+        });
+
+        WidgetUtil.trySubscribe(this, "configure", button -> {
+            final GameInfo gameInfo = getGameInfos().getSelection();
+            if (gameInfo != null) {
+                final GameConfigurationScreen gameConfigurationScreen = getManager().createScreen(GameConfigurationScreen.ASSET_URI, GameConfigurationScreen.class);
+                gameConfigurationScreen.setGameInfo(gameInfo);
+                getManager().pushScreen(gameConfigurationScreen);
             }
         });
     }

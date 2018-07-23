@@ -220,6 +220,7 @@
     "rotation-dead-zone": "Мертвая зона оси вращения",
     "save-game-path": "Нахождение сохранений:",
     "save-game-details": "Подробнее",
+    "save-game-configure": "Настройка",
     "screenshot-format": "Формат экранного снимка",
     "screenshot-size": "Разрешение экранного снимка",
     "screenshot-size-double": "двойное",
