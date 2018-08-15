@@ -22,8 +22,9 @@ import org.terasology.config.RenderingConfig;
 import org.terasology.context.Context;
 import org.terasology.engine.paths.PathManager;
 import org.terasology.engine.subsystem.common.ThreadManager;
-import org.terasology.registry.CoreRegistry;
+import org.terasology.game.Game;
 import org.terasology.persistence.internal.GamePreviewImageProvider;
+import org.terasology.registry.CoreRegistry;
 import org.terasology.rendering.opengl.fbms.DisplayResolutionDependentFBOs;
 
 import javax.imageio.ImageIO;
@@ -52,8 +53,8 @@ public class ScreenGrabber {
     private float currentExposure;
     private boolean isTakingScreenshot;
     private DisplayResolutionDependentFBOs displayResolutionDependentFBOs;
-    private Path savedGamePath;
     private boolean savingGamePreview;
+    private boolean savingScreenshot;
 
     /**
      * @param context
@@ -84,6 +85,7 @@ public class ScreenGrabber {
      * as soon as possible but not necessarily immediately after the trigger.
      */
     public void takeScreenshot() {
+        savingScreenshot = true;
         isTakingScreenshot = true;
     }
 
@@ -116,15 +118,7 @@ public class ScreenGrabber {
         int width = sceneFinalFbo.width();
         int height = sceneFinalFbo.height();
 
-        Runnable task;
-        if (savingGamePreview) {
-            task = () -> saveGamePreviewTask(buffer, width, height);
-            this.savingGamePreview = false;
-        } else {
-            task = () -> saveScreenshotTask(buffer, width, height);
-        }
-
-        threadManager.submitTask("Write screenshot", task);
+        threadManager.submitTask("Write screenshot", () -> saveScreenshotTask(buffer, width, height));
         isTakingScreenshot = false;
     }
 
@@ -137,17 +131,26 @@ public class ScreenGrabber {
      */
     private void saveScreenshotTask(ByteBuffer buffer, int width, int height) {
         final String format = renderingConfig.getScreenshotFormat();
-        final Path screenshotPath = getScreenshotPath(width, height, format);
         final BufferedImage image = convertByteBufferToBufferedImage(buffer, width, height);
-        writeImageToFile(image, screenshotPath, format);
+        if (savingGamePreview) {
+            writeImageToFile(image, getGamePreviewPath(), format);
+            savingGamePreview = false;
+        }
+        if (savingScreenshot) {
+            writeImageToFile(image, getScreenshotPath(width, height, format), format);
+            savingScreenshot = false;
+        }
     }
 
-    /**
-     *  Saves given image data to file in save game folder.
-     */
-    private void saveGamePreviewTask(ByteBuffer buffer, int width, int height) {
-        BufferedImage image = convertByteBufferToBufferedImage(buffer, width, height);
-        writeImageToFile(image, savedGamePath, "jpg");
+    private Path getGamePreviewPath() {
+        final Game game = CoreRegistry.get(Game.class);
+        if (game != null) {
+            final Path saveDirPath = PathManager.getInstance().getSavePath(game.getName());
+            return GamePreviewImageProvider.getNextGamePreviewImagePath(saveDirPath);
+        } else {
+            logger.warn("Can't schedule saving game preview image, because can't find Game instance");
+            return null;
+        }
     }
 
     private void writeImageToFile(BufferedImage image, Path path, String format) {
@@ -194,13 +197,9 @@ public class ScreenGrabber {
 
     /**
      * Schedules the saving of game preview screenshot.
-     *
-     * @param saveDirPath to save folder
      */
-    public void takeGamePreview(final Path saveDirPath)
-    {
-        this.savingGamePreview = true;
-        this.savedGamePath = GamePreviewImageProvider.getNextGamePreviewImagePath(saveDirPath);
-        this.saveScreenshot();
+    public void takeGamePreview() {
+        savingGamePreview = true;
+        saveScreenshot();
     }
 }

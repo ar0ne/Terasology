@@ -80,7 +80,11 @@ public class MenuControlSystem extends BaseComponentSystem {
     @ReceiveEvent(components = ClientComponent.class)
     public void onScreenshotCapture(ScreenshotButton event, EntityRef entity) {
         if (event.getState() == ButtonState.DOWN) {
-            CoreRegistry.get(ScreenGrabber.class).takeScreenshot();
+            final ScreenGrabber screenGrabber = CoreRegistry.get(ScreenGrabber.class);
+            if (screenGrabber != null) {
+                screenGrabber.takeScreenshot();
+                screenGrabber.takeGamePreview();
+            }
             CoreRegistry.get(AudioManager.class).playSound(Assets.getSound("engine:camera").get());
             event.consume();
         }

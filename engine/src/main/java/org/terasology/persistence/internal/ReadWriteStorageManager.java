@@ -486,9 +486,8 @@ public final class ReadWriteStorageManager extends AbstractStorageManager implem
 
     private void saveGamePreviewImage() {
         final ScreenGrabber screenGrabber = CoreRegistry.get(ScreenGrabber.class);
-        final Game game = CoreRegistry.get(Game.class);
-        if (screenGrabber != null && game != null) {
-            screenGrabber.takeGamePreview(PathManager.getInstance().getSavePath(game.getName()));
+        if (screenGrabber != null) {
+            screenGrabber.takeGamePreview();
         }
     }
 
